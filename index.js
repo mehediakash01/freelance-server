@@ -22,6 +22,20 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+const dataCollection = client.db("taskDb").collection("tasks");
+// store data from addTask
+app.post('/addTasks',async(req,res)=>{
+    const allTasks = req.body;
+    const result = await dataCollection.insertOne(allTasks);
+    res.send(result);
+
+})
+
+
+
+
+
+
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     // Send a ping to confirm a successful connection
