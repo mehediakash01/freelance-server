@@ -1,5 +1,5 @@
 require("dotenv").config();
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 const express = require("express");
 const app = express();
 const cors = require("cors");
@@ -29,6 +29,20 @@ app.post('/addTasks',async(req,res)=>{
     const result = await dataCollection.insertOne(allTasks);
     res.send(result);
 
+})
+
+// get data from the db
+app.get('/allTasks',async(req,res)=>{
+     const result = await dataCollection.find().toArray();
+     res.send(result);
+     
+})
+// get specific data from the db
+app.get(`/taskDetails/:id`,async(req,res)=>{
+    const id = req.params.id;
+    const query = {_id: new ObjectId(id)};
+    const result = await dataCollection.findOne(query);
+    res.send(result);
 })
 
 
