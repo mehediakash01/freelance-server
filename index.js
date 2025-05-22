@@ -22,33 +22,56 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-const dataCollection = client.db("taskDb").collection("tasks");
-// store data from addTask
-app.post('/addTasks',async(req,res)=>{
-    const allTasks = req.body;
-    const result = await dataCollection.insertOne(allTasks);
-    res.send(result);
+    const dataCollection = client.db("taskDb").collection("tasks");
+    // store data from addTask
+    app.post("/addTasks", async (req, res) => {
+      const allTasks = req.body;
+      const result = await dataCollection.insertOne(allTasks);
+      res.send(result);
+    });
 
-})
+    // get data from the db
+    app.get("/allTasks", async (req, res) => {
+      const result = await dataCollection.find().toArray();
+      res.send(result);
+    });
+    // get specific data from the db
+    app.get(`/taskDetails/:id`, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await dataCollection.findOne(query);
+      res.send(result);
+    });
 
-// get data from the db
-app.get('/allTasks',async(req,res)=>{
-     const result = await dataCollection.find().toArray();
-     res.send(result);
-     
-})
-// get specific data from the db
-app.get(`/taskDetails/:id`,async(req,res)=>{
-    const id = req.params.id;
-    const query = {_id: new ObjectId(id)};
-    const result = await dataCollection.findOne(query);
-    res.send(result);
-})
+    // update bid count and store it into db
 
+    app.patch(`/taskDetails:id`, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $inc: {
+          bid: 1,
+        },
+      };
+      const result = await dataCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
 
+    // get user added task from db
+    app.get(`/myTasks/:email`, async (req, res) => {
+      const userEmail = req.params.email;
+      const query = { email: userEmail };
+      const result = await dataCollection.find(query).toArray();
+      res.send(result);
+    });
 
-
-
+    // delete user task
+    app.delete("/deleteTask/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await dataCollection.deleteOne(query);
+      res.send(result);
+    });
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
