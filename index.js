@@ -72,6 +72,18 @@ async function run() {
       const result = await dataCollection.deleteOne(query);
       res.send(result);
     });
+    // update user added task
+    app.patch(`/taskDetails/:id`, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+
+      const updatedTask = req.body;
+      const updateDoc = {
+        $set: updatedTask,
+      };
+      const result = await dataCollection.updateOne(query, updateDoc);
+      res.send(result);
+    });
 
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
