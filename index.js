@@ -26,6 +26,7 @@ async function run() {
     // store data from addTask
     app.post("/addTasks", async (req, res) => {
       const allTasks = req.body;
+
       const result = await dataCollection.insertOne(allTasks);
       res.send(result);
     });
@@ -43,25 +44,37 @@ async function run() {
       res.send(result);
     });
 
-    // update bid count and store it into db
-
-    app.patch(`/taskDetails:id`, async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $inc: {
-          bid: 1,
-        },
-      };
-      const result = await dataCollection.updateOne(query, updateDoc);
-      res.send(result);
-    });
-
     // get user added task from db
     app.get(`/myTasks/:email`, async (req, res) => {
       const userEmail = req.params.email;
       const query = { email: userEmail };
       const result = await dataCollection.find(query).toArray();
+      res.send(result);
+    });
+
+    // get data according deadline
+  app.get('/featuredTask', async (req, res) => {
+  const allTasks = await dataCollection.find().toArray();
+
+  const sortedTasks = allTasks
+    .filter(task => task.date)
+    .sort((a, b) => new Date(a.date) - new Date(b.date)) 
+    .slice(0, 6);
+
+  res.send(sortedTasks);
+});
+
+
+    // update bid count and store it into db
+
+    app.patch("/taskDetails/:id", async (req, res) => {
+      const id = req.params.id;
+      const updatedTask = req.body;
+      const query = { _id: new ObjectId(id) };
+      const updateDoc = {
+        $set: updatedTask,
+      };
+      const result = await dataCollection.updateOne(query, updateDoc);
       res.send(result);
     });
 
