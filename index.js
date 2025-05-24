@@ -66,17 +66,22 @@ async function run() {
 
 
     // update bid count and store it into db
+app.patch("/taskDetails/:id", async (req, res) => {
+  const id = req.params.id;
+  const query = { _id: new ObjectId(id) };
+const {bid} = req.body;
+  
 
-    app.patch("/taskDetails/:id", async (req, res) => {
-      const id = req.params.id;
-      const updatedTask = req.body;
-      const query = { _id: new ObjectId(id) };
-      const updateDoc = {
-        $set: updatedTask,
-      };
-      const result = await dataCollection.updateOne(query, updateDoc);
-      res.send(result);
-    });
+
+  const updateDoc = {
+    $set:{ bid: Number(bid)}
+  };
+
+  const result = await dataCollection.updateOne(query, updateDoc);
+  res.send(result);
+});
+
+
 
     // delete user task
     app.delete("/deleteTask/:id", async (req, res) => {
