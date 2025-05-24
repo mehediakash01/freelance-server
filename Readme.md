@@ -1,8 +1,6 @@
 # RedLink server
 
 ## 🌐 Live Server URL
-[https://task-sphere-server.vercel.app](https://task-sphere-server.vercel.app)  
-*(Replace this with your actual live server URL)*
 
 ---
 
