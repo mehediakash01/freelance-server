@@ -42,37 +42,13 @@ async function run() {
     });
 
     // Get all tasks with search and sort support
-    app.get("/allTasks", async (req, res) => {
-      try {
-        const { search = "", sort = "latest" } = req.query;
+   app.get("/allTasks",async (req,res)=>{
+    const result = await dataCollection.find().toArray();
+    res.send(result);
+   })
+     
 
-        const query = {
-          $or: [
-            { title: { $regex: search, $options: "i" } },
-            { description: { $regex: search, $options: "i" } },
-          ],
-        };
-
-        let sortOption = {};
-        if (sort === "budget_asc") {
-          sortOption = { budget: 1 };
-        } else if (sort === "budget_desc") {
-          sortOption = { budget: -1 };
-        } else {
-          sortOption = { createdAt: -1 };
-        }
-
-        const tasks = await dataCollection
-          .find(query)
-          .sort(sortOption)
-          .toArray();
-        res.send(tasks);
-      } catch (error) {
-        console.error("Fetch allTasks error:", error);
-        res.status(500).send({ error: "Failed to fetch tasks" });
-      }
-    });
-
+       
     // Get tasks by user email
     app.get("/myTasks/:email", async (req, res) => {
       try {
@@ -102,6 +78,14 @@ async function run() {
         res.status(500).send({ error: "Failed to fetch featured tasks" });
       }
     });
+
+    // get data by id
+    app.get("/taskDetails/:id",async (req,res)=>{
+      const {id}=req.params;
+      const filter ={_id : new ObjectId(id)};
+      const result = await dataCollection.findOne(filter);
+      res.send(result);
+    })
 
     // Update bid count only
     app.patch("/taskDetails/:id", async (req, res) => {
