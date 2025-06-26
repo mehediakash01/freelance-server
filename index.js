@@ -41,14 +41,33 @@ async function run() {
       }
     });
 
-    // Get all tasks with search and sort support
-   app.get("/allTasks",async (req,res)=>{
-    const result = await dataCollection.find().toArray();
-    res.send(result);
-   })
-     
+    // ✅ Backend: Search logic
+   app.get("/allTasks", async (req, res) => {
+ 
 
-       
+  const { search } = req.query;
+
+  let query = {};
+  if (search) {
+    query = {
+      $or: [
+        { taskTitle: { $regex: search, $options: "i" } },
+        { category: { $regex: search, $options: "i" } },
+      ],
+    };
+  }
+
+  try {
+    const result = await dataCollection.find(query).toArray();
+   
+    res.send(result);
+  } catch (err) {
+   
+    res.status(500).send({ error: "Failed to fetch tasks" });
+  }
+});
+
+
     // Get tasks by user email
     app.get("/myTasks/:email", async (req, res) => {
       try {
@@ -80,12 +99,12 @@ async function run() {
     });
 
     // get data by id
-    app.get("/taskDetails/:id",async (req,res)=>{
-      const {id}=req.params;
-      const filter ={_id : new ObjectId(id)};
+    app.get("/taskDetails/:id", async (req, res) => {
+      const { id } = req.params;
+      const filter = { _id: new ObjectId(id) };
       const result = await dataCollection.findOne(filter);
       res.send(result);
-    })
+    });
 
     // Update bid count only
     app.patch("/taskDetails/:id", async (req, res) => {
@@ -93,7 +112,7 @@ async function run() {
         const id = req.params.id;
         const { bid } = req.body;
         const query = { _id: new ObjectId(id) };
-        const updateDoc = { $set: { bid: (bid) } };
+        const updateDoc = { $set: { bid: bid } };
         const result = await dataCollection.updateOne(query, updateDoc);
         res.send(result);
       } catch (error) {
@@ -110,7 +129,6 @@ async function run() {
         const query = { _id: new ObjectId(id) };
         const updateDoc = { $set: updatedTask };
         const result = await dataCollection.updateOne(query, updateDoc);
-       
 
         res.send(result);
       } catch (error) {
