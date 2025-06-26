@@ -119,13 +119,15 @@ async function run() {
     });
 
     // Update entire task
-    app.put("/taskDetails/:id", async (req, res) => {
+    app.patch("/taskUpdate/:id", async (req, res) => {
       try {
         const id = req.params.id;
         const updatedTask = req.body;
         const query = { _id: new ObjectId(id) };
         const updateDoc = { $set: updatedTask };
         const result = await dataCollection.updateOne(query, updateDoc);
+       
+
         res.send(result);
       } catch (error) {
         console.error("Update task error:", error);
