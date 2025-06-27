@@ -45,7 +45,7 @@ async function run() {
    app.get("/allTasks", async (req, res) => {
  
 
-  const { search } = req.query;
+  const { search,sort } = req.query;
 
   let query = {};
   if (search) {
@@ -57,8 +57,19 @@ async function run() {
     };
   }
 
+   // Determine sort condition
+  let sortOption = {};
+  if (sort === "budget_asc") {
+    sortOption = { budget: 1 };
+  } else if (sort === "budget_desc") {
+    sortOption = { budget: -1 };
+  } else  {
+   sortOption = { _id: -1 };
+  }
+
+
   try {
-    const result = await dataCollection.find(query).toArray();
+    const result = await dataCollection.find(query).sort(sortOption).toArray();
    
     res.send(result);
   } catch (err) {
